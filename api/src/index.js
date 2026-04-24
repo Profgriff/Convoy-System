@@ -22,7 +22,9 @@ const connection = new IORedis(redisUrl);
 
 // Queue (must match worker)
 const convoyQueue = new Queue('convoyQueue', {
-  connection,
+  connection: {
+    url: redisUrl
+  },
   defaultJobOptions: {
     attempts: 5,
     backoff: {

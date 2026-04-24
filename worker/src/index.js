@@ -2,7 +2,6 @@ require('dotenv').config();
 const pino = require('pino');
 const { Pool } = require('pg');
 const { Worker } = require('bullmq');
-const IORedis = require('ioredis');
 const nodemailer = require('nodemailer');
 
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
@@ -25,9 +24,6 @@ const redisUrl = process.env.REDIS_URL;
 if (!redisUrl) {
   throw new Error('REDIS_URL is required');
 }
-const connection = new IORedis(redisUrl, {
-  maxRetriesPerRequest: null
-});
 
 // Queue name MUST match API side
 const QUEUE_NAME = 'convoyQueue';
@@ -76,7 +72,7 @@ async function initWorker() {
       logger.info({ jobId: job.id }, '✅ Job done');
       return result;
     },
-    { connection, concurrency: 5 }
+    { connection: { url: redisUrl }, concurrency: 5 }
   );
 
   worker.on('completed', async (job) => {
