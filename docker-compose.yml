@@ -1,0 +1,32 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: convoy
+      POSTGRES_PASSWORD: convoy
+      POSTGRES_DB: convoydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: ./api
+    ports:
+      - "4000:4000"
+    depends_on:
+      - redis
+
+  worker:
+    build: ./worker
+    depends_on:
+      - redis
+      - postgres
+
+volumes:
+  pgdata:
