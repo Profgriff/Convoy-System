@@ -21,7 +21,11 @@ const transporter = process.env.ALERT_EMAIL && process.env.SMTP_HOST ? nodemaile
 }) : null;
 
 // Redis connection
-const connection = new IORedis(process.env.REDIS_URL || "redis://redis:6379", {
+const redisUrl = process.env.REDIS_URL;
+if (!redisUrl) {
+  throw new Error('REDIS_URL is required');
+}
+const connection = new IORedis(redisUrl, {
   maxRetriesPerRequest: null
 });
 

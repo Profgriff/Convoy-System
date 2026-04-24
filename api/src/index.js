@@ -14,7 +14,11 @@ app.use(helmet());
 app.use(rateLimit({ windowMs: 60000, max: 100 }));
 
 // Redis connection
-const connection = new IORedis(process.env.REDIS_URL || "redis://redis:6379");
+const redisUrl = process.env.REDIS_URL;
+if (!redisUrl) {
+  throw new Error('REDIS_URL is required');
+}
+const connection = new IORedis(redisUrl);
 
 // Queue (must match worker)
 const convoyQueue = new Queue('convoyQueue', {
